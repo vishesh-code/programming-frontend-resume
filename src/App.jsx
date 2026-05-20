@@ -6,10 +6,10 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import Landing from "./Landing";
-import LoginPage from "./Login";
+import Landing from "./pages/Landing";
+import LoginPage from "./pages/Login";
 import { UserProvider, useUser } from "./context/userContext"; // Import context
-
+import ResetPassword from "./pages/PasswordReset";
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useUser();
 
@@ -40,7 +40,7 @@ function AppRouter() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginWrapper />} />
-
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           {/* Protect the /app route */}
           <Route
             path="/app"

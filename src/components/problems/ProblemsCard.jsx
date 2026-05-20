@@ -9,7 +9,7 @@ import {
   Copy,
   Target,
 } from "lucide-react";
-import { useTheme } from "../context/themeContext";
+import { useTheme } from "../../context/themeContext";
 
 // --- HELPER FUNCTION ---
 const getDifficultyColor = (difficulty, darkMode) => {

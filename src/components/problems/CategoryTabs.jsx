@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import apiClient from "../utils/apiClient";
+import apiClient from "../../utils/apiClient";
 
 // Fallback data provided by user
 const FALLBACK_CATEGORIES = [

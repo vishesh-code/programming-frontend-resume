@@ -1,5 +1,5 @@
-import { useUser } from "../context/userContext";
-import { useTheme } from "../context/themeContext";
+import { useUser } from "../../context/userContext";
+import { useTheme } from "../../context/themeContext";
 import { useNavigate } from "react-router-dom";
 import { Code, Sun, Moon, LogOut } from "lucide-react";
 
