@@ -1,12 +1,32 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+📝 Project Overview & Continuity Log
+📌 Project Essentials
+Project Name: Personal programming Practice tracker
+Core Purpose: To store the programing question and the file resources
+Main Tech Stack: [e.g., React, Node.js,mogodb atlas,]
+🚀 Deployment & Hosting Details
+Frontend
+Hosting Platform: [e.g., Render-github login]
+Live URL: https://programming-frontend-resume.onrender.com
+Deployment Method: [ Automatic on git push to main branch ]
+Backend & API
+Hosting Platform: [Render -github login ]
+Live API URL: https://programming-backend-resume.onrender.com
+Database
+Provider: [ MongoDB Atlas ]
+Database Name: Stored in bitwarden .env file
 
-Currently, two official plugins are available:
+🔑 Source Code & Credentials Location
+GitHub Repository: frontend -https://github.com/vishesh-code/programming-frontend-resume
+Backend- https://github.com/vishesh-code/programming-backend-resume
+Local Environment File: Check .env in the root folder for required keys./bitwarden
+Production Credentials Location: [render Environment Variables]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+
+
+
+
