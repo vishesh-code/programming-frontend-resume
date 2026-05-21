@@ -6,7 +6,7 @@ import { UserProvider, useUser } from "./context/userContext";
 import ResetPassword from "./pages/PasswordReset";
 import MyFiles from "./pages/MyFiles";
 import AppLayout from "./components/layout/AppLayout"; 
-
+import Notes from "./pages/Notes.jsx";
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useUser();
   if (loading)
@@ -36,6 +36,7 @@ function AppRouter() {
           >
             <Route index element={<Landing />} />
             <Route path="files" element={<MyFiles />} />
+            <Route path="notes" element={<Notes />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />
