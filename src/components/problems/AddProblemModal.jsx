@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { PlusCircle, X } from "lucide-react";
 
-// Pass onAdd (function) from parent to handle adding the new problem to state/backend
 const AddProblemModal = ({ onAdd }) => {
   const [open, setOpen] = useState(false);
 
@@ -14,22 +13,22 @@ const AddProblemModal = ({ onAdd }) => {
     tags: "",
     time_complexity: "",
     space_complexity: "",
-    solved: false
+    solved: false,
   });
 
   // For error handling or loading (optional)
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     // Basic validation
     if (!form.question.trim()) {
@@ -41,28 +40,33 @@ const AddProblemModal = ({ onAdd }) => {
     // Pass tags as array, trimmed
     const problemData = {
       ...form,
-      tags: form.tags.split(",").map(t => t.trim()).filter(Boolean)
+      tags: form.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
     };
     // Call parent's handler
-    Promise.resolve(onAdd(problemData)).then(() => {
-      setOpen(false);
-      setForm({
-        question: "",
-        description: "",
-        solution: "",
-        difficulty: "Medium",
-        category: "",
-        tags: "",
-        time_complexity: "",
-        space_complexity: "",
-        solved: false
+    Promise.resolve(onAdd(problemData))
+      .then(() => {
+        setOpen(false);
+        setForm({
+          question: "",
+          description: "",
+          solution: "",
+          difficulty: "Medium",
+          category: "",
+          tags: "",
+          time_complexity: "",
+          space_complexity: "",
+          solved: false,
+        });
+        setLoading(false);
+        setError("");
+      })
+      .catch((err) => {
+        setError(err?.message || "Error adding problem.");
+        setLoading(false);
       });
-      setLoading(false);
-      setError("");
-    }).catch(err => {
-      setError(err?.message || "Error adding problem.");
-      setLoading(false);
-    });
   };
 
   return (
@@ -80,9 +84,12 @@ const AddProblemModal = ({ onAdd }) => {
       {open && (
         <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center">
           <div className="bg-white rounded-2xl shadow-xl p-7 w-full max-w-xl relative">
-            <button 
+            <button
               className="absolute top-3 right-3 text-slate-400 hover:text-red-400 transition-colors"
-              onClick={() => { setOpen(false); setError(""); }}
+              onClick={() => {
+                setOpen(false);
+                setError("");
+              }}
               tabIndex={0}
             >
               <X className="h-5 w-5" />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import apiClient from "../../utils/apiClient";
+import { useTheme } from "../../context/themeContext";
 
 // Fallback data provided by user
 const FALLBACK_CATEGORIES = [
@@ -9,21 +10,9 @@ const FALLBACK_CATEGORIES = [
     slug: "all-problems",
     __v: 0,
   },
-  {
-    _id: { $oid: "6932b8a9ccfcc7763c51aa94" },
-    name: "Array",
-    slug: "array",
-  },
-  {
-    _id: { $oid: "6932b8a9ccfcc7763c51aa95" },
-    name: "String",
-    slug: "string",
-  },
-  {
-    _id: { $oid: "6932b8a9ccfcc7763c51aa96" },
-    name: "React",
-    slug: "react",
-  },
+  { _id: { $oid: "6932b8a9ccfcc7763c51aa94" }, name: "Array", slug: "array" },
+  { _id: { $oid: "6932b8a9ccfcc7763c51aa95" }, name: "String", slug: "string" },
+  { _id: { $oid: "6932b8a9ccfcc7763c51aa96" }, name: "React", slug: "react" },
   {
     _id: { $oid: "6932b8a9ccfcc7763c51aa97" },
     name: "JavaScript",
@@ -41,7 +30,9 @@ const FALLBACK_CATEGORIES = [
   },
 ];
 
-const CategoryTabs = ({ activeTab, handleTabClick, problems, darkMode }) => {
+// Added problems = [] default to prevent the .length crash!
+const CategoryTabs = ({ activeTab, setActiveTab, problems = [] }) => {
+  const { darkMode } = useTheme(); // Grab darkMode directly from context
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,21 +66,20 @@ const CategoryTabs = ({ activeTab, handleTabClick, problems, darkMode }) => {
     fetchCategories();
   }, []);
 
-  const tabsWithCounts = useMemo(
-    () =>
-      categories.map((tab) => ({
-        ...tab,
-        count:
-          tab.id === "All"
-            ? problems.length
-            : problems.filter((p) => p.category === tab.id).length,
-      })),
-    [problems, categories]
-  );
+  const tabsWithCounts = useMemo(() => {
+    return categories.map((tab) => {
+      const count =
+        tab.id === "All"
+          ? problems.length
+          : problems.filter((p) => (p.category?.name || p.category) === tab.id)
+              .length;
+
+      return { ...tab, count };
+    });
+  }, [problems, categories]);
 
   if (loading) {
     return (
-      // Changed pb-2 to py-2 to prevent top clipping
       <div className="w-full mb-8 overflow-x-auto py-2">
         <div className="flex space-x-3 min-w-max px-1">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -111,7 +101,7 @@ const CategoryTabs = ({ activeTab, handleTabClick, problems, darkMode }) => {
         {tabsWithCounts.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
+            onClick={() => setActiveTab(tab.id)} 
             className={`
               flex items-center space-x-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200
               ${
@@ -119,8 +109,8 @@ const CategoryTabs = ({ activeTab, handleTabClick, problems, darkMode }) => {
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-2 ring-blue-600 ring-offset-2 " +
                     (darkMode ? "ring-offset-slate-900" : "ring-offset-white")
                   : darkMode
-                  ? "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700"
-                  : "bg-white text-gray-600 hover:bg-gray-50 hover:text-blue-600 border border-gray-200 shadow-sm"
+                    ? "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700"
+                    : "bg-white text-gray-600 hover:bg-gray-50 hover:text-blue-600 border border-gray-200 shadow-sm"
               }
             `}
           >
@@ -132,8 +122,8 @@ const CategoryTabs = ({ activeTab, handleTabClick, problems, darkMode }) => {
                   activeTab === tab.id
                     ? "bg-blue-500/30 text-white"
                     : darkMode
-                    ? "bg-slate-700 text-slate-300"
-                    : "bg-gray-100 text-gray-500"
+                      ? "bg-slate-700 text-slate-300"
+                      : "bg-gray-100 text-gray-500"
                 }
               `}
             >

@@ -1,57 +1,43 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/Login";
-import { UserProvider, useUser } from "./context/userContext"; // Import context
+import { UserProvider, useUser } from "./context/userContext";
 import ResetPassword from "./pages/PasswordReset";
+import MyFiles from "./pages/MyFiles";
+import AppLayout from "./components/layout/AppLayout"; 
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useUser();
-
-  // 1. Wait for UserContext to finish checking localStorage/Expiration
-  if (loading) {
+  if (loading)
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-blue-600 font-semibold">
-          Loading authentication...
-        </div>
+        <div className="text-blue-600 font-semibold">Loading...</div>
       </div>
     );
-  }
-
-  // 2. If after loading, user is null (because token was missing OR expired), redirect
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
+  if (!user) return <Navigate to="/" replace />;
   return children;
 };
 
-// 2. Main AppRouter
 function AppRouter() {
   return (
-    // Wrap everything in UserProvider so auth state is accessible
     <UserProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginWrapper />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          {/* Protect the /app route */}
           <Route
             path="/app"
             element={
               <ProtectedRoute>
-                <Landing />
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Landing />} />
+            <Route path="files" element={<MyFiles />} />
+          </Route>
 
-          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
@@ -59,15 +45,9 @@ function AppRouter() {
   );
 }
 
-// LoginWrapper helps handle the redirect logic after login
 function LoginWrapper() {
   const { user } = useUser();
-
-  // If user is already logged in, redirect them to App
-  if (user) {
-    return <Navigate to="/app" replace />;
-  }
-
+  if (user) return <Navigate to="/app" replace />;
   return <LoginPage />;
 }
 

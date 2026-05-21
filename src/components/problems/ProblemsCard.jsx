@@ -38,7 +38,6 @@ const getDifficultyColor = (difficulty, darkMode) => {
   }
 };
 
-// --- SINGLE CARD COMPONENT (Internal Use) ---
 const SingleProblemCard = ({
   problem,
   problemNumber,
@@ -49,7 +48,6 @@ const SingleProblemCard = ({
   onCopyCode,
   darkMode
 }) => {
-  // Safety check
   if (!problem) return null;
 
   const difficultyStyle = getDifficultyColor(problem.difficulty, darkMode);
@@ -165,7 +163,6 @@ const SingleProblemCard = ({
 
 // --- MAIN LIST COMPONENT (Default Export) ---
 const ProblemsCard = ({ problems, darkMode }) => {
-  // We manage the "View" state (expanded/copied) here because Landing.jsx doesn't provide these handlers
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
 
@@ -180,12 +177,8 @@ const ProblemsCard = ({ problems, darkMode }) => {
   };
 
   const handleToggleSolved = (id) => {
-    // NOTE: This only updates the UI locally for now. 
-    // To save this to the database, you need to pass a handler from Landing.jsx
     console.log("Toggle solved for ID:", id);
   };
-
-  // If no problems exist in the array, return null (EmptyState in Landing handles the UI)
   if (!problems || problems.length === 0) {
     return null;
   }
