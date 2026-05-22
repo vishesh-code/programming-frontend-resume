@@ -679,153 +679,473 @@
 
 
 
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
+// import { useTheme } from "../context/themeContext";
+// import { Plus, Trash2, Save, FileText, Clock } from "lucide-react";
+// import ReactQuill from "react-quill-new";
+// import "react-quill-new/dist/quill.snow.css";
+
+// // Toolbar configuration for the rich text editor
+// const editorModules = {
+//   toolbar: [
+//     [{ header: [1, 2, 3, 4, 5, 6, false] }],
+//     ["bold", "italic", "underline", "strike", "blockquote"],
+//     [
+//       { list: "ordered" },
+//       { list: "bullet" },
+//       { indent: "-1" },
+//       { indent: "+1" },
+//     ],
+//     [{ color: [] }, { background: [] }],
+//     [{ align: [] }],
+//     ["link", "image", "code-block"],
+//     ["clean"], // remove formatting button
+//   ],
+// };
+
+// const editorFormats = [
+//   "header",
+//   "bold",
+//   "italic",
+//   "underline",
+//   "strike",
+//   "blockquote",
+//   "list",
+//   "bullet",
+//   "indent",
+//   "color",
+//   "background",
+//   "align",
+//   "link",
+//   "image",
+//   "code-block",
+// ];
+
+// const Notes = () => {
+//   const { darkMode } = useTheme();
+
+//   // State to handle our notes
+//   const [notes, setNotes] = useState([]);
+//   const [activeNoteId, setActiveNoteId] = useState(null);
+
+//   // State for the currently edited note
+//   const [title, setTitle] = useState("");
+//   const [content, setContent] = useState("");
+//   const [saveStatus, setSaveStatus] = useState("Saved");
+
+//   // Load notes from local storage on mount
+//   useEffect(() => {
+//     const savedNotes = JSON.parse(localStorage.getItem("my-notes") || "[]");
+//     setNotes(savedNotes);
+//     if (savedNotes.length > 0) {
+//       setActiveNote(savedNotes[0]);
+//     } else {
+//       createNewNote();
+//     }
+//   }, []);
+
+//   // Save changes to localStorage whenever `notes` array updates
+//   useEffect(() => {
+//     if (notes.length > 0) {
+//       localStorage.setItem("my-notes", JSON.stringify(notes));
+//     }
+//   }, [notes]);
+
+//   // Auto-save effect (saves 1 second after user stops typing)
+//   useEffect(() => {
+//     if (!activeNoteId) return;
+    
+//     setSaveStatus("Saving...");
+//     const timeoutId = setTimeout(() => {
+//       handleSave();
+//       setSaveStatus("Saved");
+//     }, 1000);
+
+//     return () => clearTimeout(timeoutId);
+//   }, [title, content]);
+
+//   const setActiveNote = (note) => {
+//     setActiveNoteId(note.id);
+//     setTitle(note.title);
+//     setContent(note.content);
+//   };
+
+//   const createNewNote = () => {
+//     const newNote = {
+//       id: Date.now().toString(),
+//       title: "Untitled Document",
+//       content: "",
+//       updatedAt: new Date().toISOString(),
+//     };
+//     setNotes([newNote, ...notes]);
+//     setActiveNote(newNote);
+//   };
+
+//   const handleSave = () => {
+//     if (!activeNoteId) return;
+//     setNotes((prevNotes) =>
+//       prevNotes.map((note) => {
+//         if (note.id === activeNoteId) {
+//           return {
+//             ...note,
+//             title: title || "Untitled Document",
+//             content,
+//             updatedAt: new Date().toISOString(),
+//           };
+//         }
+//         return note;
+//       })
+//     );
+//   };
+
+//   const handleDelete = (id, e) => {
+//     e.stopPropagation();
+//     const remainingNotes = notes.filter((n) => n.id !== id);
+//     setNotes(remainingNotes);
+//     localStorage.setItem("my-notes", JSON.stringify(remainingNotes));
+
+//     if (remainingNotes.length > 0) {
+//       setActiveNote(remainingNotes[0]);
+//     } else {
+//       createNewNote();
+//     }
+//   };
+
+//   const activeNoteData = notes.find((n) => n.id === activeNoteId);
+
+//   // Helper to strip HTML tags for the sidebar preview
+//   const stripHtml = (html) => {
+//     let tmp = document.createElement("DIV");
+//     tmp.innerHTML = html;
+//     return tmp.textContent || tmp.innerText || "No content...";
+//   };
+
+//   return (
+//     <div
+//       className={`flex h-[calc(100vh-140px)] rounded-2xl border shadow-sm overflow-hidden ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
+//     >
+//       {/* Inject Custom CSS to style React Quill for Dark Mode and better heights 
+//       */}
+//       <style>{`
+//         .ql-container {
+//           font-family: inherit !important;
+//           font-size: 1rem !important;
+//           height: calc(100% - 42px) !important;
+//           border-bottom-left-radius: 0.75rem;
+//           border-bottom-right-radius: 0.75rem;
+//         }
+//         .ql-toolbar {
+//           border-top-left-radius: 0.75rem;
+//           border-top-right-radius: 0.75rem;
+//         }
+        
+//         /* Dark Mode Overrides for Quill */
+//         .dark .ql-toolbar {
+//           background-color: #1e293b; /* slate-800 */
+//           border-color: #334155 !important; /* slate-700 */
+//         }
+//         .dark .ql-container {
+//           border-color: #334155 !important; /* slate-700 */
+//           color: #e2e8f0; /* slate-200 */
+//         }
+//         .dark .ql-picker-label { color: #cbd5e1; }
+//         .dark .ql-stroke { stroke: #cbd5e1; }
+//         .dark .ql-fill { fill: #cbd5e1; }
+//         .dark .ql-picker-options { 
+//           background-color: #1e293b;
+//           border-color: #334155;
+//         }
+//         .dark .ql-editor.ql-blank::before {
+//           color: #475569; /* slate-600 */
+//         }
+//       `}</style>
+
+//       {/* Sidebar: Note List */}
+//       <div
+//         className={`w-1/3 max-w-[280px] flex flex-col border-r shrink-0 ${darkMode ? "border-slate-700 bg-slate-800/50" : "border-slate-200 bg-slate-50/50"}`}
+//       >
+//         <div className="p-4 border-b border-inherit flex items-center justify-between">
+//           <h2 className={`font-bold text-lg ${darkMode ? "text-white" : "text-slate-900"}`}>
+//             My Notes
+//           </h2>
+//           <button
+//             onClick={createNewNote}
+//             className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+//           >
+//             <Plus className="w-4 h-4" />
+//           </button>
+//         </div>
+
+//         <div className="flex-1 overflow-y-auto p-3 space-y-2">
+//           {notes.map((note) => (
+//             <div
+//               key={note.id}
+//               onClick={() => setActiveNote(note)}
+//               className={`p-3 rounded-xl cursor-pointer border transition-all group ${
+//                 activeNoteId === note.id
+//                   ? darkMode
+//                     ? "bg-blue-900/30 border-blue-700 text-blue-100"
+//                     : "bg-blue-50 border-blue-200 text-blue-900"
+//                   : darkMode
+//                     ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+//                     : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+//               }`}
+//             >
+//               <div className="flex items-start justify-between">
+//                 <div className="min-w-0 pr-2">
+//                   <h4 className="font-semibold text-sm truncate">{note.title}</h4>
+//                   <p className="text-xs truncate mt-1 opacity-70">
+//                     {stripHtml(note.content)}
+//                   </p>
+//                   <p
+//                     className={`text-[10px] mt-2 flex items-center gap-1 ${activeNoteId === note.id ? (darkMode ? "text-blue-300" : "text-blue-600") : darkMode ? "text-slate-500" : "text-slate-400"}`}
+//                   >
+//                     <Clock className="w-3 h-3" />
+//                     {new Date(note.updatedAt).toLocaleDateString()}{" "}
+//                     {new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+//                   </p>
+//                 </div>
+//                 <button
+//                   onClick={(e) => handleDelete(note.id, e)}
+//                   className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1"
+//                 >
+//                   <Trash2 className="w-4 h-4" />
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Main Panel: Note Editor */}
+//       <div className={`flex-1 flex flex-col ${darkMode ? "bg-slate-900" : "bg-white"}`}>
+//         {activeNoteData ? (
+//           <>
+//             {/* Editor Header */}
+//             <div
+//               className={`px-6 py-4 border-b flex items-center justify-between ${darkMode ? "border-slate-700" : "border-slate-200"}`}
+//             >
+//               <div className="flex items-center gap-3 w-full max-w-xl">
+//                 <FileText
+//                   className={`w-6 h-6 ${darkMode ? "text-blue-400" : "text-blue-600"}`}
+//                 />
+//                 <input
+//                   type="text"
+//                   value={title}
+//                   onChange={(e) => setTitle(e.target.value)}
+//                   placeholder="Document Title"
+//                   className={`w-full bg-transparent text-xl font-bold outline-none placeholder-slate-400 ${darkMode ? "text-white" : "text-slate-900"}`}
+//                 />
+//               </div>
+//               <div className="flex items-center gap-4">
+//                 <span className={`text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+//                   {saveStatus}
+//                 </span>
+//                 <button
+//                   onClick={() => { handleSave(); setSaveStatus("Saved"); }}
+//                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+//                 >
+//                   <Save className="w-4 h-4" /> Save
+//                 </button>
+//               </div>
+//             </div>
+
+//             {/* Rich Text Editor Body */}
+//             <div className="flex-1 p-6 overflow-hidden">
+//               <div className="h-full">
+//                 <ReactQuill
+//                   theme="snow"
+//                   value={content}
+//                   onChange={setContent}
+//                   modules={editorModules}
+//                   formats={editorFormats}
+//                   placeholder="Start writing your amazing notes here..."
+//                   className="h-full"
+//                 />
+//               </div>
+//             </div>
+//           </>
+//         ) : (
+//           <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+//             <FileText className="w-16 h-16 mb-4 opacity-50" />
+//             <p className="text-lg font-medium">Select a note or create a new one</p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Notes;
+
+
+
+
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "../context/themeContext";
-import { Plus, Trash2, Save, FileText, Clock } from "lucide-react";
+import { Plus, Trash2, Save, FileText, Clock, Loader2 } from "lucide-react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
+import apiClient from "../utils/apiClient"; // <-- Added API Client
 
 // Toolbar configuration for the rich text editor
 const editorModules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
+    [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
     [{ color: [] }, { background: [] }],
     [{ align: [] }],
     ["link", "image", "code-block"],
-    ["clean"], // remove formatting button
+    ["clean"], 
   ],
 };
 
 const editorFormats = [
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "indent",
-  "color",
-  "background",
-  "align",
-  "link",
-  "image",
-  "code-block",
+  "header", "bold", "italic", "underline", "strike", "blockquote",
+  "list", "bullet", "indent", "color", "background", "align",
+  "link", "image", "code-block",
 ];
 
 const Notes = () => {
   const { darkMode } = useTheme();
 
-  // State to handle our notes
   const [notes, setNotes] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // State for the currently edited note
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [saveStatus, setSaveStatus] = useState("Saved");
 
-  // Load notes from local storage on mount
-  useEffect(() => {
-    const savedNotes = JSON.parse(localStorage.getItem("my-notes") || "[]");
-    setNotes(savedNotes);
-    if (savedNotes.length > 0) {
-      setActiveNote(savedNotes[0]);
-    } else {
-      createNewNote();
+  // 1. Load notes from the database on mount
+  const fetchNotes = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get('/notes');
+      setNotes(response.data);
+      
+      if (response.data.length > 0) {
+        setActiveNote(response.data[0]);
+      } else {
+        createNewNote();
+      }
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  // Save changes to localStorage whenever `notes` array updates
   useEffect(() => {
-    if (notes.length > 0) {
-      localStorage.setItem("my-notes", JSON.stringify(notes));
-    }
-  }, [notes]);
+    fetchNotes();
+  }, [fetchNotes]);
 
-  // Auto-save effect (saves 1 second after user stops typing)
+  // 2. Auto-save effect
   useEffect(() => {
     if (!activeNoteId) return;
     
+    // Don't auto-save if data matches the initial load state to prevent unnecessary API calls
+    const currentNote = notes.find(n => n._id === activeNoteId);
+    if (currentNote && currentNote.title === title && currentNote.content === content) return;
+
     setSaveStatus("Saving...");
-    const timeoutId = setTimeout(() => {
-      handleSave();
-      setSaveStatus("Saved");
+    const timeoutId = setTimeout(async () => {
+      await handleSave();
     }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [title, content]);
 
   const setActiveNote = (note) => {
-    setActiveNoteId(note.id);
+    setActiveNoteId(note._id); // Using MongoDB _id
     setTitle(note.title);
     setContent(note.content);
+    setSaveStatus("Saved");
   };
 
-  const createNewNote = () => {
-    const newNote = {
-      id: Date.now().toString(),
-      title: "Untitled Document",
-      content: "",
-      updatedAt: new Date().toISOString(),
-    };
-    setNotes([newNote, ...notes]);
-    setActiveNote(newNote);
-  };
-
-  const handleSave = () => {
-    if (!activeNoteId) return;
-    setNotes((prevNotes) =>
-      prevNotes.map((note) => {
-        if (note.id === activeNoteId) {
-          return {
-            ...note,
-            title: title || "Untitled Document",
-            content,
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return note;
-      })
-    );
-  };
-
-  const handleDelete = (id, e) => {
-    e.stopPropagation();
-    const remainingNotes = notes.filter((n) => n.id !== id);
-    setNotes(remainingNotes);
-    localStorage.setItem("my-notes", JSON.stringify(remainingNotes));
-
-    if (remainingNotes.length > 0) {
-      setActiveNote(remainingNotes[0]);
-    } else {
-      createNewNote();
+  // 3. Create a new blank note in the DB
+  const createNewNote = async () => {
+    try {
+      setSaveStatus("Creating...");
+      const response = await apiClient.post('/notes', {
+        title: "Untitled Document",
+        content: ""
+      });
+      const newNote = response.data;
+      setNotes([newNote, ...notes]);
+      setActiveNote(newNote);
+    } catch (error) {
+      console.error("Error creating note:", error);
+      setSaveStatus("Error");
     }
   };
 
-  const activeNoteData = notes.find((n) => n.id === activeNoteId);
+  // 4. Save/Update note to the DB
+  const handleSave = async () => {
+    if (!activeNoteId) return;
+    
+    try {
+      setSaveStatus("Saving...");
+      const response = await apiClient.put(`/notes/${activeNoteId}`, {
+        title: title || "Untitled Document",
+        content: content
+      });
+
+      const updatedNote = response.data;
+      
+      // Update local state so sidebar reflects changes
+      setNotes((prevNotes) =>
+        prevNotes.map((note) => (note._id === activeNoteId ? updatedNote : note))
+      );
+      
+      setSaveStatus("Saved");
+    } catch (error) {
+      console.error("Error saving note:", error);
+      setSaveStatus("Failed to save");
+    }
+  };
+
+  // 5. Delete note from the DB
+  const handleDelete = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await apiClient.delete(`/notes/${id}`);
+      
+      const remainingNotes = notes.filter((n) => n._id !== id);
+      setNotes(remainingNotes);
+
+      if (remainingNotes.length > 0) {
+        if (activeNoteId === id) setActiveNote(remainingNotes[0]);
+      } else {
+        createNewNote();
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
+  };
+
+  const activeNoteData = notes.find((n) => n._id === activeNoteId);
 
   // Helper to strip HTML tags for the sidebar preview
   const stripHtml = (html) => {
+    if (!html) return "No content...";
     let tmp = document.createElement("DIV");
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || "No content...";
   };
 
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center h-[calc(100vh-140px)] rounded-2xl border ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={`flex h-[calc(100vh-140px)] rounded-2xl border shadow-sm overflow-hidden ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
-    >
-      {/* Inject Custom CSS to style React Quill for Dark Mode and better heights 
-      */}
+    <div className={`flex h-[calc(100vh-140px)] rounded-2xl border shadow-sm overflow-hidden ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
       <style>{`
         .ql-container {
           font-family: inherit !important;
@@ -838,15 +1158,13 @@ const Notes = () => {
           border-top-left-radius: 0.75rem;
           border-top-right-radius: 0.75rem;
         }
-        
-        /* Dark Mode Overrides for Quill */
         .dark .ql-toolbar {
-          background-color: #1e293b; /* slate-800 */
-          border-color: #334155 !important; /* slate-700 */
+          background-color: #1e293b; 
+          border-color: #334155 !important; 
         }
         .dark .ql-container {
-          border-color: #334155 !important; /* slate-700 */
-          color: #e2e8f0; /* slate-200 */
+          border-color: #334155 !important; 
+          color: #e2e8f0; 
         }
         .dark .ql-picker-label { color: #cbd5e1; }
         .dark .ql-stroke { stroke: #cbd5e1; }
@@ -856,22 +1174,15 @@ const Notes = () => {
           border-color: #334155;
         }
         .dark .ql-editor.ql-blank::before {
-          color: #475569; /* slate-600 */
+          color: #475569;
         }
       `}</style>
 
       {/* Sidebar: Note List */}
-      <div
-        className={`w-1/3 max-w-[280px] flex flex-col border-r shrink-0 ${darkMode ? "border-slate-700 bg-slate-800/50" : "border-slate-200 bg-slate-50/50"}`}
-      >
+      <div className={`w-1/3 max-w-[280px] flex flex-col border-r shrink-0 ${darkMode ? "border-slate-700 bg-slate-800/50" : "border-slate-200 bg-slate-50/50"}`}>
         <div className="p-4 border-b border-inherit flex items-center justify-between">
-          <h2 className={`font-bold text-lg ${darkMode ? "text-white" : "text-slate-900"}`}>
-            My Notes
-          </h2>
-          <button
-            onClick={createNewNote}
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-          >
+          <h2 className={`font-bold text-lg ${darkMode ? "text-white" : "text-slate-900"}`}>My Notes</h2>
+          <button onClick={createNewNote} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
             <Plus className="w-4 h-4" />
           </button>
         </div>
@@ -879,36 +1190,24 @@ const Notes = () => {
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {notes.map((note) => (
             <div
-              key={note.id}
+              key={note._id}
               onClick={() => setActiveNote(note)}
               className={`p-3 rounded-xl cursor-pointer border transition-all group ${
-                activeNoteId === note.id
-                  ? darkMode
-                    ? "bg-blue-900/30 border-blue-700 text-blue-100"
-                    : "bg-blue-50 border-blue-200 text-blue-900"
-                  : darkMode
-                    ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                activeNoteId === note._id
+                  ? darkMode ? "bg-blue-900/30 border-blue-700 text-blue-100" : "bg-blue-50 border-blue-200 text-blue-900"
+                  : darkMode ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0 pr-2">
                   <h4 className="font-semibold text-sm truncate">{note.title}</h4>
-                  <p className="text-xs truncate mt-1 opacity-70">
-                    {stripHtml(note.content)}
-                  </p>
-                  <p
-                    className={`text-[10px] mt-2 flex items-center gap-1 ${activeNoteId === note.id ? (darkMode ? "text-blue-300" : "text-blue-600") : darkMode ? "text-slate-500" : "text-slate-400"}`}
-                  >
+                  <p className="text-xs truncate mt-1 opacity-70">{stripHtml(note.content)}</p>
+                  <p className={`text-[10px] mt-2 flex items-center gap-1 ${activeNoteId === note._id ? (darkMode ? "text-blue-300" : "text-blue-600") : darkMode ? "text-slate-500" : "text-slate-400"}`}>
                     <Clock className="w-3 h-3" />
-                    {new Date(note.updatedAt).toLocaleDateString()}{" "}
-                    {new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(note.updatedAt).toLocaleDateString()} {new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
-                <button
-                  onClick={(e) => handleDelete(note.id, e)}
-                  className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1"
-                >
+                <button onClick={(e) => handleDelete(note._id, e)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -921,14 +1220,9 @@ const Notes = () => {
       <div className={`flex-1 flex flex-col ${darkMode ? "bg-slate-900" : "bg-white"}`}>
         {activeNoteData ? (
           <>
-            {/* Editor Header */}
-            <div
-              className={`px-6 py-4 border-b flex items-center justify-between ${darkMode ? "border-slate-700" : "border-slate-200"}`}
-            >
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
               <div className="flex items-center gap-3 w-full max-w-xl">
-                <FileText
-                  className={`w-6 h-6 ${darkMode ? "text-blue-400" : "text-blue-600"}`}
-                />
+                <FileText className={`w-6 h-6 ${darkMode ? "text-blue-400" : "text-blue-600"}`} />
                 <input
                   type="text"
                   value={title}
@@ -938,19 +1232,13 @@ const Notes = () => {
                 />
               </div>
               <div className="flex items-center gap-4">
-                <span className={`text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
-                  {saveStatus}
-                </span>
-                <button
-                  onClick={() => { handleSave(); setSaveStatus("Saved"); }}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                >
+                <span className={`text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{saveStatus}</span>
+                <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
                   <Save className="w-4 h-4" /> Save
                 </button>
               </div>
             </div>
 
-            {/* Rich Text Editor Body */}
             <div className="flex-1 p-6 overflow-hidden">
               <div className="h-full">
                 <ReactQuill
