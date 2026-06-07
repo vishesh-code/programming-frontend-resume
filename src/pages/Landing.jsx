@@ -280,11 +280,22 @@ const Landing = () => {
   }, [fetchProblems]);
 
   // 2. Update a single problem locally
+  // const handleProblemUpdate = (updatedProblem) => {
+  //   if (!updatedProblem) return;
+  //   setProblems((prevProblems) =>
+  //     prevProblems.map((p) => (p._id === updatedProblem._id ? { ...p, solved: updatedProblem.solved } : p))
+  //   );
+  // };
+
+  // 2. Update a single problem in local state
   const handleProblemUpdate = (updatedProblem) => {
     if (!updatedProblem) return;
     setProblems((prevProblems) =>
       prevProblems.map((p) => (p._id === updatedProblem._id ? { ...p, solved: updatedProblem.solved } : p))
     );
+
+    // 🔥 ADD THIS LINE: Tell the sidebar to refresh the stats!
+    window.dispatchEvent(new Event('problemStatusChanged'));
   };
 
   // 3. Handle Add Problem
