@@ -62,7 +62,9 @@ const LeftSidebar = () => {
   const menuItems = [
     { name: "Home", icon: Home, path: "/app" },
     { name: "Files", icon: Folder, path: "/app/files" },
-    { name: "Notes", icon: Edit3, path: "/app/notes" }, // Added Notes Tab
+    { name: "Notes", icon: Edit3, path: "/app/notes" },
+   { name: "Todo", icon: Edit3, path: "/app/todo" },
+
     { name: "Analytics", icon: BarChart2, path: "/app/analytics" },
     { name: "Settings", icon: Settings, path: "/app/settings" }, 
   ];
