@@ -147,7 +147,7 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/themeContext';
 import { Search, Plus, Trash2, Shield, User, Power } from 'lucide-react';
 import apiClient from '../../utils/apiClient'; // ⚠️ Adjust this path to where your apiClient.js is located
-import { useUser } from '../../context/UserContext'; // ⚠️ Adjust if needed to get current logged in user
+import { useUser } from '../../context/userContext'; // ⚠️ Adjust if needed to get current logged in user
 
 const AdminUsers = () => {
   const { darkMode } = useTheme();
