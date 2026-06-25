@@ -23,6 +23,10 @@ import AdminNotes from "./pages/admin/AdminNotes";
 import AdminTaxonomy from "./pages/admin/AdminTaxonomy";
 import AdminSettings from "./pages/admin/AdminSettings";
 import TodoCalendar from "./pages/Todo.jsx";
+import Quiz from './pages/Quiz.jsx'
+import StudyMaterial from './pages/StudyMaterial.jsx'
+
+
 // 1. Standard Protected Route (For normal users ONLY)
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useUser();
@@ -100,6 +104,8 @@ function AppRouter() {
             <Route path="files" element={<MyFiles />} />
             <Route path="notes" element={<Notes />} />
             <Route path="todo" element={<TodoCalendar />} />
+            <Route path="quiz" element={<Quiz />} />
+            <Route path="study" element={<StudyMaterial />} />
           </Route>
 
           {/* Fallback route */}

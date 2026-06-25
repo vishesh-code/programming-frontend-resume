@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@plugin "@tailwindcss/typography";
 @layer base {
   html {
     font-size: 15px; /* Slightly smaller base font */
