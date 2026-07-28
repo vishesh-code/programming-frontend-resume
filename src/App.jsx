@@ -22,6 +22,7 @@ import AdminFiles from "./pages/admin/AdminFiles";
 import AdminNotes from "./pages/admin/AdminNotes";
 import AdminTaxonomy from "./pages/admin/AdminTaxonomy";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminStudy from "./pages/admin/AdminStudy";
 import TodoCalendar from "./pages/Todo.jsx";
 import Quiz from './pages/Quiz.jsx'
 import StudyMaterial from './pages/StudyMaterial.jsx'
@@ -88,6 +89,7 @@ function AppRouter() {
               <Route path="files" element={<AdminFiles />} />
               <Route path="notes" element={<AdminNotes />} />
               <Route path="taxonomy" element={<AdminTaxonomy />} />
+              <Route path="study" element={<AdminStudy />} />
             </Route>
           </Route>
 

@@ -26,6 +26,7 @@ const AdminLayout = () => {
     { path: '/admin/files', icon: FolderOpen, label: 'File Manager' },
     { path: '/admin/notes', icon: StickyNote, label: 'Notes & Content' },
     { path: '/admin/taxonomy', icon: Tags, label: 'Tags & Categories' },
+     { path: '/admin/study', icon: Tags, label: 'study' },
   ];
 
   return (
