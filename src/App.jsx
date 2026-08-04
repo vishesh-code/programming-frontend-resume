@@ -23,6 +23,7 @@ import AdminNotes from "./pages/admin/AdminNotes";
 import AdminTaxonomy from "./pages/admin/AdminTaxonomy";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminStudy from "./pages/admin/AdminStudy";
+import AdminProblems from "./pages/admin/AdminProblems.jsx";
 import TodoCalendar from "./pages/Todo.jsx";
 import Quiz from './pages/Quiz.jsx'
 import StudyMaterial from './pages/StudyMaterial.jsx'
@@ -74,12 +75,7 @@ function AppRouter() {
           <Route path="/" element={<LoginWrapper />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* Admin Routes (Completely Isolated) */}
-          {/* <Route path="/admin" element={<AdminRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-            </Route>
-          </Route> */}
+       
 
           <Route path="/admin" element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
@@ -90,6 +86,8 @@ function AppRouter() {
               <Route path="notes" element={<AdminNotes />} />
               <Route path="taxonomy" element={<AdminTaxonomy />} />
               <Route path="study" element={<AdminStudy />} />
+              <Route path="problem" element={<AdminProblems/>} />
+
             </Route>
           </Route>
 

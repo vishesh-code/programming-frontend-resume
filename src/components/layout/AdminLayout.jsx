@@ -22,6 +22,7 @@ const AdminLayout = () => {
 
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/admin/problem', icon: Users, label: 'Problem' },
     { path: '/admin/users', icon: Users, label: 'User Management' },
     { path: '/admin/files', icon: FolderOpen, label: 'File Manager' },
     { path: '/admin/notes', icon: StickyNote, label: 'Notes & Content' },
