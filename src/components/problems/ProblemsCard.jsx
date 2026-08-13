@@ -379,7 +379,7 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
 
                   {/* Code only — no explanation mixed in here */}
                   <pre className={`p-3 rounded-xl overflow-x-auto text-xs font-mono border ${darkMode ? "bg-slate-900 text-slate-300 border-slate-700" : "bg-slate-900 text-slate-200 border-slate-800"}`}>
-                    <code>{currentSolution.code || "
+                    <code>{currentSolution.code || ""}</code>
                   </pre>
                 </div>
               )
