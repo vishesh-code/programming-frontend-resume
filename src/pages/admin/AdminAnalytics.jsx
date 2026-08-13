@@ -9,7 +9,7 @@ import { TrendingUp, Users, Code, Activity, Download } from 'lucide-react';
 const AdminAnalytics = () => {
   const { darkMode } = useTheme();
 
-  // --- DUMMY DATA ---
+  
   const userGrowthData = [
     { name: 'Jan', users: 400 }, { name: 'Feb', users: 600 },
     { name: 'Mar', users: 850 }, { name: 'Apr', users: 930 },
@@ -24,12 +24,12 @@ const AdminAnalytics = () => {
   ];
 
   const difficultyData = [
-    { name: 'Easy', value: 4500, color: '#10b981' },   // Emerald
-    { name: 'Medium', value: 2800, color: '#f59e0b' }, // Amber
-    { name: 'Hard', value: 1132, color: '#ef4444' }    // Red
+    { name: 'Easy', value: 4500, color: '#10b981' },   
+    { name: 'Medium', value: 2800, color: '#f59e0b' }, 
+    { name: 'Hard', value: 1132, color: '#ef4444' }    
   ];
 
-  // --- STYLING HELPERS ---
+  
   const textColor = darkMode ? '#94a3b8' : '#64748b';
   const gridColor = darkMode ? '#334155' : '#e2e8f0';
   const tooltipStyle = {

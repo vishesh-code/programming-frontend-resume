@@ -6,20 +6,20 @@ import apiClient from '../../utils/apiClient';
 const AdminProblems = () => {
   const { darkMode } = useTheme();
   
-  // State
+  
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Pagination State
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Modal States
+  
   const [selectedProblem, setSelectedProblem] = useState(null);
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
 
-  // 1. Fetch All Problems
+  
   const fetchProblems = async () => {
     try {
       setLoading(true);
@@ -37,7 +37,7 @@ const AdminProblems = () => {
     fetchProblems();
   }, []);
 
-  // 2. Delete Single Problem
+  
   const handleDeleteProblem = async (problemId) => {
     if (!window.confirm("Are you sure you want to delete this problem?")) return;
 
@@ -49,7 +49,7 @@ const AdminProblems = () => {
     }
   };
 
-  // 3. Bulk Delete All Problems
+  
   const handleDeleteAll = async () => {
     try {
       const { data } = await apiClient.delete('/admin/problems');
@@ -61,7 +61,7 @@ const AdminProblems = () => {
     }
   };
 
-  // 4. Filter & Pagination Logic
+  
   const filteredProblems = useMemo(() => {
     return problems.filter(p => 
       p.question?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -76,7 +76,7 @@ const AdminProblems = () => {
   }, [filteredProblems, currentPage, itemsPerPage]);
 
   useEffect(() => {
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1); 
   }, [searchTerm, itemsPerPage]);
 
   const handlePagination = (direction) => {

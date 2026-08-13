@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import apiClient from "../utils/apiClient";
 
-/* ── Floating code snippets in background ── */
 const CODE_SNIPPETS = [
   "O(n log n)",
   "two-sum",
@@ -92,12 +91,10 @@ const LoginPage = () => {
   const { darkMode, setDarkMode } = useTheme();
   const navigate = useNavigate();
 
-  // UI States
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
-  // Form States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -130,7 +127,6 @@ const LoginPage = () => {
         localStorage.setItem("user-email", data.user.email);
         localStorage.setItem("user-id", data.user.id);
 
-        // Include the role in the local storage if you want it to persist, though context handles it via token decryption usually.
         if (data.user.role) {
           localStorage.setItem("user-role", data.user.role);
         }
@@ -139,10 +135,9 @@ const LoginPage = () => {
           token: data.token,
           email: data.user.email,
           id: data.user.id,
-          role: data.user.role, // 🔥 Add role to user context
+          role: data.user.role,
         });
 
-        // 🔥 Route based on Admin Role
         if (data.user.role === "admin") {
           navigate("/admin");
         } else {
@@ -201,10 +196,9 @@ const LoginPage = () => {
         token: data.token,
         email: data.user.email,
         id: data.user.id,
-        role: data.user.role, // 🔥 Add role to user context
+        role: data.user.role,
       });
 
-      // 🔥 Route based on Admin Role
       if (data.user.role === "admin") {
         navigate("/admin");
       } else {
@@ -219,7 +213,6 @@ const LoginPage = () => {
     }
   };
 
-  // UI styling assignments
   const themeClasses = darkMode
     ? "bg-slate-900"
     : "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50";
