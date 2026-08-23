@@ -9,11 +9,15 @@ import { Search, PlusCircle, Frown } from "lucide-react";
  * @param {function} onAddProblem - Function to open the Add Problem modal (optional, not strictly needed as a button is outside).
  */
 const EmptyState = ({
-  darkMode,
-  isInitialEmpty, 
-  hasActiveFilters, 
-  resetFilters,
-  onAddProblem, 
+  darkMode = false,
+  isInitialEmpty = false,
+  hasActiveFilters = false,
+  // 🔥 FIX: this component's primary button always calls
+  // onPrimaryAction (derived from resetFilters/onAddProblem below).
+  // If a caller ever forgets to pass one, default to a no-op instead of
+  // undefined so clicking the button can never throw.
+  resetFilters = () => {},
+  onAddProblem,
 }) => {
   let iconComponent;
   let title;
@@ -31,7 +35,11 @@ const EmptyState = ({
     message =
       "It looks like you haven't added any practice problems yet. Click the 'Add Problem' button above to add your first question!";
     primaryButtonText = "Add Problem";
-    onPrimaryAction = resetFilters;
+    // 🔥 FIX: this branch's button was labeled "Add Problem" but wired to
+    // resetFilters (clearing filters instead of opening the add-problem
+    // flow). Fall back to resetFilters only if no onAddProblem was given,
+    // so the button still does *something* rather than nothing.
+    onPrimaryAction = onAddProblem || resetFilters;
   }
   else if (!isInitialEmpty && hasActiveFilters) {
     iconComponent = (

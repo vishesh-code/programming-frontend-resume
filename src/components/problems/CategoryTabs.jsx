@@ -37,10 +37,16 @@ const CategoryTabs = ({ activeTab, setActiveTab, problems = [] }) => {
   const [loading, setLoading] = useState(true);
 
   const processCategories = (data) => {
-    const formatted = data.map((cat) => ({
-      id: cat.slug === "all-problems" ? "All" : cat.name,
-      label: cat.name,
-    }));
+    // 🔥 FIX: if the API ever returns something other than an array
+    // (e.g. { categories: [...] }, null, or an error object), .map()
+    // would throw and take the whole page down with it.
+    const list = Array.isArray(data) ? data : [];
+    const formatted = list
+      .filter((cat) => cat && cat.name)
+      .map((cat) => ({
+        id: cat.slug === "all-problems" ? "All" : cat.name,
+        label: cat.name,
+      }));
 
     return formatted.sort((a, b) => {
       if (a.id === "All") return -1;

@@ -89,18 +89,36 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
 
   const handleCopyCode = (code) => {
     if (!code) return;
-    navigator.clipboard.writeText(code);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    // 🔥 FIX: clipboard.writeText() returns a promise that can reject
+    // (insecure/non-HTTPS context, permission denied, older Safari) —
+    // previously that rejection was unhandled, which is a silent
+    // console error and leaves the button never showing "Copied!".
+    navigator.clipboard
+      .writeText(code)
+      .then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy code:", err);
+      });
   };
 
   const handleToggleSolved = async () => {
     try {
       setIsToggling(true);
       const response = await apiClient.patch(`/problems/${problem._id}/toggle-solved`);
-      if (onUpdate) onUpdate({ _id: problem._id, solved: response.data.solved });
+      // 🔥 FIX: fall back to the flipped current value if the API ever
+      // responds without a `solved` field, instead of writing `undefined`
+      // into state (which made the badge silently disappear).
+      const nextSolved = response?.data?.solved ?? !problem.solved;
+      if (onUpdate) onUpdate({ _id: problem._id, solved: nextSolved });
     } catch (error) {
       console.error("Failed to toggle solved status", error);
+      // 🔥 FIX: previously a failed toggle was silent — the button just
+      // stopped spinning with no feedback, and the UI now disagreed with
+      // the server. Let the user know it didn't take.
+      alert(error.response?.data?.message || "Failed to update problem status. Please try again.");
     } finally {
       setIsToggling(false);
     }
@@ -114,6 +132,9 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
       if (onDelete) onDelete(problem._id);
     } catch (error) {
       console.error("Failed to delete problem", error);
+      // 🔥 FIX: same as above — a failed delete previously failed silently,
+      // leaving the user thinking the problem was removed when it wasn't.
+      alert(error.response?.data?.message || "Failed to delete problem. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -147,7 +168,10 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
         chatHistory: chatMessages
       });
 
-      setChatMessages([...newHistory, { role: "ai", text: response.data.reply }]);
+      // 🔥 FIX: if the API responds 200 but without a `reply` field,
+      // ReactMarkdown would previously be handed `undefined` as children.
+      const replyText = response?.data?.reply || "Sorry, I couldn't generate a response for that.";
+      setChatMessages([...newHistory, { role: "ai", text: replyText }]);
     } catch (error) {
       setChatMessages([...newHistory, { role: "ai", text: "❌ Sorry, I encountered an error connecting to the server." }]);
     } finally {
@@ -208,7 +232,7 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
             </div>
 
             {/* Quick Actions Menu */}
-            <div className="flex items-center space-x-2 sm:ml-4 shrink-0">
+            <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 sm:ml-4 shrink-0">
               {onEdit && (
                 <button onClick={() => onEdit(problem)} className={`p-2 rounded-lg transition-all duration-200 ${darkMode ? "text-slate-400 hover:bg-slate-700 hover:text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`} title="Edit">
                   <Edit className="h-4 w-4" />
@@ -269,12 +293,20 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
             )}
 
             {/* Tag Chips */}
-            {problem.tags && problem.tags.map((tag, i) => (
-              <span key={i} className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium border ${darkMode ? "bg-slate-700 text-slate-300 border-slate-600" : "bg-slate-100 text-slate-600 border-slate-200"}`}>
-                <Hash className="w-3 h-3 opacity-60" />
-                {tag.name || tag}
-              </span>
-            ))}
+            {/* 🔥 FIX: `tag.name || tag` would render the raw tag object
+                itself (crashing React with "Objects are not valid as a
+                React child") if a tag ever came back as an object with no
+                `name` field. Coerce to a safe string instead. */}
+            {problem.tags && problem.tags.map((tag, i) => {
+              const tagLabel = typeof tag === "string" ? tag : tag?.name;
+              if (!tagLabel) return null;
+              return (
+                <span key={tag?._id || i} className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium border ${darkMode ? "bg-slate-700 text-slate-300 border-slate-600" : "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                  <Hash className="w-3 h-3 opacity-60" />
+                  {tagLabel}
+                </span>
+              );
+            })}
           </div>
 
         </div>
@@ -432,7 +464,7 @@ const ProblemsCard = ({ problem, index, onUpdate, onEdit, onDelete, onShare }) =
 
             {/* TAB: AI TUTOR */}
             {activeTab === "ai" && (
-              <div className={`flex flex-col transition-all duration-300 animate-fadeUp ${isChatExpanded ? "h-[650px]" : "h-[350px]"}`}>
+              <div className={`flex flex-col transition-all duration-300 animate-fadeUp ${isChatExpanded ? "h-[420px] sm:h-[650px]" : "h-[280px] sm:h-[350px]"}`}>
 
                 <div className={`flex-1 overflow-y-auto p-3 rounded-xl border mb-3 space-y-4 ${darkMode ? "bg-slate-900 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
 

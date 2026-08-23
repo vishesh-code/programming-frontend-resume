@@ -48,3 +48,33 @@
     @apply flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all;
   }
 }
+
+/* 🔥 FIX: these two utility classes are used throughout the Coding module
+   (CategoryTabs, ProblemsCard, AddProblemModal, Landing, etc.) but were
+   never actually defined anywhere, so they silently did nothing —
+   category tab scrollbars were always visible and "animate-fadeUp"
+   elements just popped in with no animation. Defining them here (global
+   CSS, so every module that already uses these class names benefits). */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fadeUp {
+    animation: fadeUp 0.25s ease-out;
+  }
+}

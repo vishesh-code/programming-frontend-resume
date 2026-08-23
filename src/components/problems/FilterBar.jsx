@@ -60,7 +60,12 @@ const FilterBar = ({
     >
       <div className="space-y-4">
         {/* Top Row: Search and Add Modal Trigger */}
-        <div className="flex gap-3">
+        {/* 🔥 FIX: the Add Problem button used to be `hidden sm:block`,
+            which removed it entirely on phones with no replacement —
+            there was no way to add a problem on mobile. It now stacks
+            below the search box on narrow screens and sits inline on
+            larger ones. */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search
               className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${darkMode ? "text-slate-400" : "text-slate-400"}`}
@@ -75,7 +80,7 @@ const FilterBar = ({
           </div>
           {/* This renders the actual AddProblemModal button exactly where we want it */}
           {addProblemComponent && (
-            <div className="hidden sm:block shrink-0">
+            <div className="w-full sm:w-auto shrink-0">
               {addProblemComponent}
             </div>
           )}

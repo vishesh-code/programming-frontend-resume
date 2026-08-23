@@ -33,10 +33,13 @@ const Landing = () => {
     try {
       setLoading(true);
       const response = await apiClient.get(`/problems?tab=${mainTab}`);
-      const data = response.data.problems
+      const data = response.data?.problems
         ? response.data.problems
         : response.data;
-      setProblems(data);
+      // 🔥 FIX: response.data can be missing/malformed (empty body, wrong
+      // shape, etc.) — without this guard, setProblems(undefined) would
+      // make every later problems.filter()/.map() throw and crash the page.
+      setProblems(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       console.error("Error fetching problems:", err);
@@ -54,7 +57,7 @@ const Landing = () => {
   const fetchTags = useCallback(async () => {
     try {
       const response = await apiClient.get("/tag");
-      setAllTags(response.data);
+      setAllTags(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error fetching tags:", err);
     }
@@ -125,6 +128,21 @@ const Landing = () => {
   };
 
   
+  // 🔥 Shared between FilterBar's reset button and EmptyState below, so
+  // both always clear filters the same way.
+  const resetFilters = useCallback(() => {
+    setSearchTerm("");
+    setDifficultyFilter("All");
+    setSolvedFilter("All");
+    setSelectedTags([]);
+  }, []);
+
+  const hasActiveFilters =
+    searchTerm !== "" ||
+    difficultyFilter !== "All" ||
+    solvedFilter !== "All" ||
+    selectedTags.length > 0;
+
   const filteredProblems = useMemo(() => {
     const lowerSearch = searchTerm ? searchTerm.toLowerCase() : "";
 
@@ -215,13 +233,13 @@ const Landing = () => {
     <div className="flex flex-col h-full space-y-6 animate-fadeUp">
       {/* Main Visibility Tabs */}
       <div
-        className={`flex gap-6 border-b ${darkMode ? "border-slate-700" : "border-slate-200"}`}
+        className={`flex gap-4 sm:gap-6 border-b overflow-x-auto scrollbar-hide ${darkMode ? "border-slate-700" : "border-slate-200"}`}
       >
         {["my_problems", "public", "shared"].map((tab) => (
           <button
             key={tab}
             onClick={() => setMainTab(tab)}
-            className={`pb-3 text-sm font-bold capitalize transition-colors border-b-2 ${
+            className={`pb-3 text-sm font-bold capitalize whitespace-nowrap shrink-0 transition-colors border-b-2 ${
               mainTab === tab
                 ? darkMode
                   ? "border-blue-400 text-blue-400"
@@ -253,17 +271,12 @@ const Landing = () => {
         allTags={allTags}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        onResetFilters={() => {
-          setSearchTerm("");
-          setDifficultyFilter("All");
-          setSolvedFilter("All");
-          setSelectedTags([]);
-        }}
+        onResetFilters={resetFilters}
         addProblemComponent={
           <AddProblemModal
             onAdd={handleAddProblem}
             triggerElement={
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl shadow-md transition-all font-medium text-sm w-full h-full">
+              <button className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl shadow-md transition-all font-medium text-sm w-full h-full">
                 <Plus className="w-4 h-4" /> Add Problem
               </button>
             }
@@ -309,8 +322,21 @@ const Landing = () => {
             </p>
           </div>
         ) : filteredProblems.length === 0 ? (
-         
-          <EmptyState />
+          // 🔥 FIX: EmptyState was previously rendered with no props at all.
+          // It reads darkMode/isInitialEmpty/hasActiveFilters/resetFilters,
+          // so with nothing passed: darkMode was always undefined (wrong
+          // theme), it always fell into the "Problems Unavailable" branch
+          // regardless of the real reason, and its button's onClick
+          // (onPrimaryAction) was undefined — clicking it threw a
+          // TypeError and crashed that part of the UI. At this point we
+          // already know `problems` has data but the active filters
+          // matched nothing, so isInitialEmpty is always false here.
+          <EmptyState
+            darkMode={darkMode}
+            isInitialEmpty={false}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetFilters}
+          />
         ) : (
          
           <>
@@ -396,7 +422,7 @@ const Landing = () => {
       {shareProblem && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div
-            className={`w-full max-w-md p-6 rounded-2xl shadow-xl animate-fadeUp ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
+            className={`w-full max-w-md p-5 sm:p-6 rounded-2xl shadow-xl animate-fadeUp ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
           >
             <h3
               className={`text-lg font-bold mb-1 ${darkMode ? "text-white" : "text-slate-900"}`}
@@ -404,7 +430,7 @@ const Landing = () => {
               Share Problem
             </h3>
             <p
-              className={`text-sm mb-5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}
+              className={`text-sm mb-5 break-words ${darkMode ? "text-slate-400" : "text-slate-500"}`}
             >
               Share "{shareProblem.question}" with another user.
             </p>

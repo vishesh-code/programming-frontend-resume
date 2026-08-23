@@ -77,6 +77,10 @@ const AddProblemModal = ({
   const tagInputRef = useRef(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // 🔥 FIX: previously a failed /category or /tag fetch only logged to
+  // the console — the Category dropdown just stayed empty with the
+  // required field silently unfillable, and nothing told the user why.
+  const [fetchError, setFetchError] = useState("");
 
   useEffect(() => {
     if (initialData && (open || isEdit)) {
@@ -116,15 +120,21 @@ const AddProblemModal = ({
   useEffect(() => {
     if (open || isEdit) {
       const fetchDropdownData = async () => {
+        setFetchError("");
         try {
           const [catRes, tagRes] = await Promise.all([
             apiClient.get("/category"),
             apiClient.get("/tag"),
           ]);
-          setCategories(catRes.data);
-          setAvailableTags(tagRes.data);
+          // 🔥 FIX: guard against a non-array response shape so a bad
+          // payload can't crash the category <select> or tag search below.
+          setCategories(Array.isArray(catRes.data) ? catRes.data : []);
+          setAvailableTags(Array.isArray(tagRes.data) ? tagRes.data : []);
         } catch (err) {
           console.error("Failed to fetch categories/tags:", err);
+          setFetchError(
+            "Couldn't load categories/tags. Check your connection and try reopening this form.",
+          );
         }
       };
       fetchDropdownData();
@@ -140,6 +150,28 @@ const AddProblemModal = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // 🔥 FIX: on mobile, the page behind this modal kept scrolling while
+  // the modal itself also scrolled — lock body scroll while it's open.
+  // Also lets Escape close the modal, which it previously didn't.
+  const isModalOpenForEffects = open || isEdit;
+  useEffect(() => {
+    if (!isModalOpenForEffects) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (e) => {
+      if (e.key === "Escape") handleClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModalOpenForEffects]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -214,10 +246,14 @@ const AddProblemModal = ({
   };
 
   const filteredTags = availableTags.filter((tag) => {
+    if (!tag) return false;
     const tagCategoryId = tag.category?._id || tag.category;
     const matchesCategory = tagCategoryId === form.category;
     const isNotSelected = !form.tags.includes(tag._id);
-    const matchesSearch = tag.name.toLowerCase().includes(tagSearch.toLowerCase());
+    // 🔥 FIX: tag.name.toLowerCase() would throw if a tag ever came back
+    // without a `name`, crashing the modal on every keystroke in the tag
+    // search box. Fall back to an empty string instead.
+    const matchesSearch = (tag.name || "").toLowerCase().includes(tagSearch.toLowerCase());
 
     return matchesCategory && isNotSelected && matchesSearch;
   });
@@ -293,7 +329,7 @@ const AddProblemModal = ({
             className={`w-full max-w-2xl rounded-2xl shadow-xl animate-fadeUp my-8 max-h-[90vh] overflow-y-auto ${darkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-slate-200"}`}
           >
             <div
-              className={`sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b ${darkMode ? "bg-slate-800/95 border-slate-700" : "bg-white/95 border-slate-100"}`}
+              className={`sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-4 border-b ${darkMode ? "bg-slate-800/95 border-slate-700" : "bg-white/95 border-slate-100"}`}
             >
               <h2
                 className={`text-xl font-bold ${darkMode ? "text-white" : "text-slate-900"}`}
@@ -308,7 +344,14 @@ const AddProblemModal = ({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
+              {fetchError && (
+                <div className="p-3 rounded-xl bg-amber-50 text-amber-700 text-sm font-medium border border-amber-200 flex items-center gap-2 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/40">
+                  <X className="w-4 h-4 shrink-0" />
+                  <span>{fetchError}</span>
+                </div>
+              )}
+
               <div className="space-y-1">
                 <label className={labelClasses}>Question Title *</label>
                 <input
