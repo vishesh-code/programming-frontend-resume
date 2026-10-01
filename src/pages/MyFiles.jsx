@@ -424,39 +424,47 @@ const MyFiles = () => {
                 />
               </label>
             ) : (
-              <div
-                className={`flex items-center justify-between p-4 rounded-xl border ${darkMode ? "bg-slate-900/50 border-slate-700" : "bg-slate-50 border-slate-200"}`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div
-                    className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center border ${darkMode ? "bg-blue-900/30 border-blue-800 text-blue-400" : "bg-blue-50 border-blue-200 text-blue-600"}`}
-                  >
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p
-                      className="text-sm font-semibold truncate"
-                      title={pendingFile.name}
+              <div className="flex flex-col gap-4">
+                <div
+                  className={`flex flex-col p-4 rounded-xl border ${darkMode ? "bg-slate-900/50 border-slate-700" : "bg-slate-50 border-slate-200"}`}
+                >
+                  {pendingFile.type && pendingFile.type.startsWith("image/") ? (
+                    <div className="w-full h-40 mb-4 rounded-lg overflow-hidden flex items-center justify-center bg-black/5 dark:bg-white/5">
+                      <img src={URL.createObjectURL(pendingFile)} alt="preview" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-40 mb-4 rounded-lg flex flex-col items-center justify-center bg-blue-50/50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                      <FileText className="w-12 h-12 mb-3 opacity-80" />
+                      <span className="text-xs font-medium px-3 py-1 bg-blue-100 dark:bg-blue-900/40 rounded-full">{pendingFile.type || "Unknown File Type"}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 flex-1 pr-4">
+                      <p
+                        className="text-base font-bold truncate"
+                        title={pendingFile.name}
+                      >
+                        {pendingFile.name}
+                      </p>
+                      <div className={`flex items-center gap-2 mt-1.5 text-xs ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+                        <span className="font-medium bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded">{formatSize(pendingFile.size)}</span>
+                        <span>•</span>
+                        <span>{formatDate(pendingFile.lastModified)}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setPendingFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      disabled={uploading}
+                      className={`p-2.5 shrink-0 rounded-xl text-red-500 transition-colors ${darkMode ? "bg-red-900/20 hover:bg-red-900/40" : "bg-red-50 hover:bg-red-100"} disabled:opacity-50`}
+                      title="Remove file"
                     >
-                      {pendingFile.name}
-                    </p>
-                    <p
-                      className={`text-xs ${darkMode ? "text-slate-400" : "text-slate-500"}`}
-                    >
-                      {formatSize(pendingFile.size)}
-                    </p>
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setPendingFile(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                  disabled={uploading}
-                  className={`p-2 shrink-0 rounded-lg text-red-500 transition-colors ${darkMode ? "hover:bg-red-900/30" : "hover:bg-red-50"} disabled:opacity-50`}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
               </div>
             )}
             <div className="flex items-center justify-end gap-3 mt-6">
@@ -689,26 +697,27 @@ const MyFiles = () => {
             return (
               <div
                 key={f.id}
-                className={`relative flex flex-col rounded-2xl p-5 border shadow-sm transition-all group cursor-pointer ${
+                className={`relative flex flex-col rounded-2xl p-5 border shadow-sm transition-all group ${
                   isSelected
                     ? "ring-2 ring-blue-500 border-blue-500 bg-blue-50/10"
                     : darkMode
                       ? "bg-slate-800 border-slate-700 hover:border-slate-500"
                       : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md"
                 }`}
-                onClick={() => toggleSelection(f.id)}
               >
                 {/* Checkbox (Absolute positioning inside card) */}
                 <div
                   className={`absolute top-4 right-4 z-10 transition-opacity ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
                 >
-                  {isSelected ? (
-                    <CheckSquare className="w-5 h-5 text-blue-600" />
-                  ) : (
-                    <Square
-                      className={`w-5 h-5 ${darkMode ? "text-slate-500" : "text-slate-300"}`}
-                    />
-                  )}
+                  <button onClick={(e) => { e.stopPropagation(); toggleSelection(f.id); }}>
+                    {isSelected ? (
+                      <CheckSquare className="w-5 h-5 text-blue-600" />
+                    ) : (
+                      <Square
+                        className={`w-5 h-5 ${darkMode ? "text-slate-500" : "text-slate-300"}`}
+                      />
+                    )}
+                  </button>
                 </div>
 
                 <div className="flex items-start justify-between mb-4 mt-2">
@@ -820,8 +829,7 @@ const MyFiles = () => {
                 return (
                   <tr
                     key={f.id}
-                    className={`transition-colors cursor-pointer ${isSelected ? (darkMode ? "bg-blue-900/20" : "bg-blue-50/50") : darkMode ? "hover:bg-slate-700/50" : "hover:bg-slate-50"}`}
-                    onClick={() => toggleSelection(f.id)}
+                    className={`transition-colors ${isSelected ? (darkMode ? "bg-blue-900/20" : "bg-blue-50/50") : darkMode ? "hover:bg-slate-700/50" : "hover:bg-slate-50"}`}
                   >
                     <td
                       className="px-5 py-4 w-12 text-center"

@@ -26,6 +26,7 @@ import AdminProblems from "./pages/admin/AdminProblems.jsx";
 import TodoCalendar from "./pages/Todo.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import StudyMaterial from "./pages/StudyMaterial.jsx";
+import LinkMenus from "./pages/LinkMenus.jsx";
 
 // 1. Standard Protected Route (For normal users ONLY)
 const ProtectedRoute = ({ children }) => {
@@ -101,6 +102,7 @@ function AppRouter() {
             <Route path="todo" element={<TodoCalendar />} />
             <Route path="quiz" element={<Quiz />} />
             <Route path="study" element={<StudyMaterial />} />
+            <Route path="links" element={<LinkMenus />} />
           </Route>
 
           {/* Fallback route */}
