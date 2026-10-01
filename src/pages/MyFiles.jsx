@@ -104,11 +104,6 @@ const getTypeColorClasses = (type, darkMode) => {
 };
 
 const getViewerUrl = (url, name) => {
-  if (!url) return "";
-  const ext = name?.split(".").pop().toLowerCase();
-  if (["doc", "docx", "xls", "xlsx", "csv", "ppt", "pptx"].includes(ext)) {
-    return `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
-  }
   return url;
 };
 
@@ -124,6 +119,16 @@ const MyFiles = () => {
   const [pendingFile, setPendingFile] = useState(null);
   const [viewingFile, setViewingFile] = useState(null);
   const fileInputRef = useRef(null);
+
+  const handleViewFile = (file) => {
+    const ext = file.name?.split(".").pop().toLowerCase();
+    if (["doc", "docx", "xls", "xlsx", "csv", "ppt", "pptx"].includes(ext)) {
+      // Directly open in Google Docs Viewer in a new tab
+      window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}`, "_blank");
+    } else {
+      setViewingFile(file);
+    }
+  };
 
   // UI/UX Enhancements (Selection, Bulk Actions, Rename)
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -750,7 +755,7 @@ const MyFiles = () => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    onClick={() => setViewingFile(f)}
+                    onClick={() => handleViewFile(f)}
                     className={`p-1.5 rounded-lg transition-colors ${darkMode ? "text-slate-400 hover:bg-slate-700 hover:text-blue-400" : "text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
                     title="View"
                   >
@@ -873,7 +878,7 @@ const MyFiles = () => {
                     >
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => setViewingFile(f)}
+                          onClick={() => handleViewFile(f)}
                           className={`p-2 rounded-lg transition-colors ${darkMode ? "text-slate-400 hover:bg-slate-700 hover:text-blue-400" : "text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
                         >
                           <Eye className="w-4 h-4" />
